@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolchaindefinition xmlns="http://www.netbeans.org/ns/cnd-toolchain-definition/1">
+    <toolchain name="GNU_WinAVR_toolchain" display="GNU WinAVR" family="GNU" qmakespec="cygwin-g++"/>
+     <makefile_writer class="org.kkjanius.avrsuite.avrproject.makefilewriter.AVRDefaultMakefileWriter"/>
+    <platforms stringvalue="none,windows"/>
+    <drive_letter_prefix stringvalue=""/>
+    <base_folders>
+        <base_folder path_patern=".*[\\/]winavr.*[\\/]bin[\\/]?$" pattern=".*REG_EXPAND_SZ(.*)" regestry="hklm\Software\WinAVR" suffix="bin"/>
+        <base_folder path_patern=".*[\\/]winavr.*[\\/]bin[\\/]?$" pattern=".*REG_EXPAND_SZ(.*)" regestry="hklm\Software\Wow6432Node\WinAVR" suffix="bin"/>
+    </base_folders>
+    <command_folders>
+        <command_folder path_patern=".*[\\/]winavr.*[\\/]utils[\\/]bin[\\/]?$" pattern=".*REG_EXPAND_SZ(.*)" regestry="hklm\Software\WinAVR" suffix="utils/bin"/>
+        <command_folder path_patern=".*[\\/]winavr.*[\\/]utils[\\/]bin[\\/]?$" pattern=".*REG_EXPAND_SZ(.*)" regestry="hklm\Software\Wow6432Node\WinAVR" suffix="utils/bin"/>
+    </command_folders>
+    <default_locations>
+        <platform directory="/opt/sfw/bin" os="sun_intel"/>
+        <platform directory="/usr/sfw/bin" os="sun_intel"/>
+        <platform directory="/usr/bin" os="linux"/>
+        <platform directory="/opt/sfw/bin" os="sun_sparc"/>
+        <platform directory="/usr/sfw/bin" os="sun_sparc"/>
+    </default_locations>
+</toolchaindefinition>

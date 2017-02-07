@@ -1,0 +1,978 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.kkjanius.avrsuite.avrdude.ui.action;
+
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import org.kkjanius.avrsuite.avrdude.ImplAvrProjectProgrammer.AvrDudeExitStatus;
+import org.kkjanius.avrsuite.avrdude.ImplAvrProjectProgrammer.AvrDudeProfile;
+import org.kkjanius.avrsuite.avrdude.ImplAvrProjectProgrammer.AvrDudeProfiles;
+import org.kkjanius.avrsuite.avrdude.ImplAvrProjectProgrammer.AvrDudeRunnable;
+import org.netbeans.api.options.OptionsDisplayer;
+import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
+
+/**
+ *
+ * @author janschml
+ */
+public class AvrDudeTool extends java.awt.Dialog implements Observer {
+
+    /**
+     * Creates new form AvrDudeTool
+     */
+    private AvrDudeProfile avrdudeProfile;
+    private File temp = null;
+    private File tempFiles[] = new File[10];
+    private String colFuse[] = {"Fuse", "Value"};
+    private String colLockBit[] = {"LockBit", "Value"};
+    DefaultTableModel FuseTableModel = new DefaultTableModel(null, colFuse);
+    DefaultTableModel LockBitTableModel = new DefaultTableModel(null, colLockBit);
+    List<String> fusesMem = new ArrayList<String>();
+    List<String> lockBitMem = new ArrayList<String>();
+
+    public AvrDudeTool(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+
+
+
+        initComponents();
+        List<String> prgms = AvrDudeProfiles.getAllProfiles();
+        PrgmProfileComboBox.removeAllItems();
+        for (String prgm : prgms) {
+            PrgmProfileComboBox.addItem(prgm);
+
+        }
+        String defProf = NbPreferences.forModule(AvrDudeProfile.class).get("lastProfile", "");
+        if ((PrgmProfileComboBox.getItemCount() == 0) || (defProf == null)) {
+            Messages.setText("Please define and select programer profile...");
+        }
+        PrgmProfileComboBox.setSelectedItem(defProf);
+
+        PrgmProfileComboBox.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    if (PrgmProfileComboBox.getSelectedItem() == null) {
+                        return;
+                    }
+                    avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+                    if (avrdudeProfile == null) {
+                        return;
+                    }
+                    avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+                    targetMcuCombobox.removeAllItems();
+                    List<String> supportedMCU = avrdudeProfile.getSupportedMcu();
+                    for (String mcu : supportedMCU) {
+                        targetMcuCombobox.addItem(mcu);
+                    }
+                }
+
+            }
+        });
+
+        this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+        targetMcuCombobox.removeAllItems();
+        List<String> supportedMCU = avrdudeProfile.getSupportedMcu();
+        for (String mcu : supportedMCU) {
+            targetMcuCombobox.addItem(mcu);
+        }
+
+
+        targetMcuCombobox.addItemListener(new ItemListener() {
+
+            
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    fusesMem.clear();
+                    lockBitMem.clear();
+                    avrdudeProfile.setMCU((String)targetMcuCombobox.getSelectedItem());
+                    fusesMem=avrdudeProfile.getFusesMem();
+                    lockBitMem=avrdudeProfile.getLockBitMem();
+                    updateTable(fusesMem, FuseTableModel);
+                    updateTable(lockBitMem, LockBitTableModel);
+                }
+
+            }
+        });
+        targetMcuCombobox.setSelectedItem(NbPreferences.forModule(AvrDudeProfile.class).get("lastMCU", ""));
+        FlashFilefield.setText(NbPreferences.forModule(AvrDudeProfile.class).get("lastFlashFile", ""));
+        EEpromFilefield.setText(NbPreferences.forModule(AvrDudeProfile.class).get("lastEEpromFile", ""));
+
+
+        //Generating data to table
+        fusesMem=avrdudeProfile.getFusesMem();
+        lockBitMem=avrdudeProfile.getLockBitMem();
+        updateTable(fusesMem, FuseTableModel);
+        updateTable(lockBitMem, LockBitTableModel);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTree1 = new javax.swing.JTree();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Messages = new javax.swing.JTextArea();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        PrgmProfileComboBox = new javax.swing.JComboBox();
+        Profiles = new javax.swing.JButton();
+        targetMcuCombobox = new javax.swing.JComboBox();
+        jLabel6 = new javax.swing.JLabel();
+        GetConnectedBtn = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        FlashFilefield = new javax.swing.JTextField();
+        SelectFileFlashBtn = new javax.swing.JButton();
+        WriteFlashBtn = new javax.swing.JButton();
+        VerifyFlashBtn = new javax.swing.JButton();
+        ReadFlashBtn = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        SelectFileFEEpromBtn = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        EEpromFilefield = new javax.swing.JTextField();
+        WriteEEpromBtn = new javax.swing.JButton();
+        VerifyFEEpromBtn = new javax.swing.JButton();
+        ReadEEpromBtn = new javax.swing.JButton();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        ReadFlashFormat = new javax.swing.JComboBox();
+        WriteFlashFormat = new javax.swing.JComboBox();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        ReadEEpromFormat = new javax.swing.JComboBox();
+        WriteEEpromFormat = new javax.swing.JComboBox();
+        jPanel3 = new javax.swing.JPanel();
+        ReadFuse = new javax.swing.JButton();
+        VerifyFuse = new javax.swing.JButton();
+        WriteFuse = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        FusesTable = new javax.swing.JTable(){
+            public boolean isCellEditable(int rowIndex, int colIndex) {
+                if(colIndex==1){
+                    return true;
+                }
+                return false;
+            }};
+            ;
+            jPanel4 = new javax.swing.JPanel();
+            jLabel7 = new javax.swing.JLabel();
+            ReadLBbtn = new javax.swing.JButton();
+            VerifyLBbtn = new javax.swing.JButton();
+            WriteLBbtn = new javax.swing.JButton();
+            jScrollPane4 = new javax.swing.JScrollPane();
+            LockBitTable = new javax.swing.JTable(){
+                public boolean isCellEditable(int rowIndex, int colIndex) {
+                    if(colIndex==1){
+                        return true;
+                    }
+                    return false;
+                }};
+                jButton1 = new javax.swing.JButton();
+                jButton2 = new javax.swing.JButton();
+
+                jScrollPane3.setViewportView(jTree1);
+
+                addWindowListener(new java.awt.event.WindowAdapter() {
+                    public void windowClosing(java.awt.event.WindowEvent evt) {
+                        closeDialog(evt);
+                    }
+                });
+
+                Messages.setBackground(new java.awt.Color(238, 238, 238));
+                Messages.setColumns(20);
+                Messages.setEditable(false);
+                Messages.setForeground(new java.awt.Color(255, 0, 0));
+                Messages.setRows(3);
+                jScrollPane1.setViewportView(Messages);
+
+                jLabel1.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel1.text")); // NOI18N
+
+                PrgmProfileComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+                Profiles.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.Profiles.text")); // NOI18N
+                Profiles.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        ProfilesActionPerformed(evt);
+                    }
+                });
+
+                targetMcuCombobox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+                jLabel6.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel6.text")); // NOI18N
+
+                GetConnectedBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.GetConnectedBtn.text")); // NOI18N
+                GetConnectedBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        GetConnectedBtnActionPerformed(evt);
+                    }
+                });
+
+                javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+                jPanel1.setLayout(jPanel1Layout);
+                jPanel1Layout.setHorizontalGroup(
+                    jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel6))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(targetMcuCombobox, 0, 209, Short.MAX_VALUE)
+                            .addComponent(PrgmProfileComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(Profiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(GetConnectedBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                );
+                jPanel1Layout.setVerticalGroup(
+                    jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(PrgmProfileComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1)
+                            .addComponent(Profiles))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(targetMcuCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6)
+                            .addComponent(GetConnectedBtn))
+                        .addContainerGap(186, Short.MAX_VALUE))
+                );
+
+                jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
+
+                jLabel2.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel2.text")); // NOI18N
+
+                FlashFilefield.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.FlashFilefield.text")); // NOI18N
+
+                SelectFileFlashBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.SelectFileFlashBtn.text")); // NOI18N
+                SelectFileFlashBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        SelectFileFlashBtnActionPerformed(evt);
+                    }
+                });
+
+                WriteFlashBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.WriteFlashBtn.text")); // NOI18N
+                WriteFlashBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        WriteFlashBtnActionPerformed(evt);
+                    }
+                });
+
+                VerifyFlashBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.VerifyFlashBtn.text")); // NOI18N
+                VerifyFlashBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        VerifyFlashBtnActionPerformed(evt);
+                    }
+                });
+
+                ReadFlashBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.ReadFlashBtn.text")); // NOI18N
+                ReadFlashBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        ReadFlashBtnActionPerformed(evt);
+                    }
+                });
+
+                jLabel3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+                jLabel3.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel3.text")); // NOI18N
+
+                SelectFileFEEpromBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.SelectFileFEEpromBtn.text")); // NOI18N
+                SelectFileFEEpromBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        SelectFileFEEpromBtnActionPerformed(evt);
+                    }
+                });
+
+                jLabel4.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+                jLabel4.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel4.text")); // NOI18N
+
+                jLabel5.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel5.text")); // NOI18N
+
+                EEpromFilefield.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.EEpromFilefield.text")); // NOI18N
+
+                WriteEEpromBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.WriteEEpromBtn.text")); // NOI18N
+                WriteEEpromBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        WriteEEpromBtnActionPerformed(evt);
+                    }
+                });
+
+                VerifyFEEpromBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.VerifyFEEpromBtn.text")); // NOI18N
+                VerifyFEEpromBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        VerifyFEEpromBtnActionPerformed(evt);
+                    }
+                });
+
+                ReadEEpromBtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.ReadEEpromBtn.text")); // NOI18N
+                ReadEEpromBtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        ReadEEpromBtnActionPerformed(evt);
+                    }
+                });
+
+                jLabel8.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel8.text")); // NOI18N
+
+                jLabel10.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel10.text")); // NOI18N
+
+                ReadFlashFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "i", "s", "r", "m", "d", "h", "o", "b" }));
+
+                WriteFlashFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "a", "i", "s", "r", "m", "d", "h", "o", "b" }));
+
+                jLabel11.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel11.text")); // NOI18N
+
+                jLabel12.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel12.text")); // NOI18N
+
+                ReadEEpromFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "i", "s", "r", "m", "d", "h", "o", "b" }));
+
+                WriteEEpromFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "a", "i", "s", "r", "m", "d", "h", "o", "b" }));
+
+                javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+                jPanel2.setLayout(jPanel2Layout);
+                jPanel2Layout.setHorizontalGroup(
+                    jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(42, 42, 42)
+                                .addComponent(FlashFilefield))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel11)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(ReadEEpromFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(24, 24, 24)
+                                        .addComponent(jLabel12)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(WriteEEpromFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel3)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel8)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(ReadFlashFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabel10)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(WriteFlashFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(ReadFlashBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(VerifyFlashBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(WriteFlashBtn))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(ReadEEpromBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(VerifyFEEpromBtn)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(WriteEEpromBtn))
+                                    .addComponent(jLabel2))
+                                .addGap(0, 8, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(EEpromFilefield)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(SelectFileFlashBtn, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(SelectFileFEEpromBtn, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())
+                );
+                jPanel2Layout.setVerticalGroup(
+                    jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(FlashFilefield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2)
+                            .addComponent(SelectFileFlashBtn))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel10)
+                            .addComponent(ReadFlashFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(WriteFlashFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ReadFlashBtn)
+                            .addComponent(VerifyFlashBtn)
+                            .addComponent(WriteFlashBtn))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(EEpromFilefield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5)
+                            .addComponent(SelectFileFEEpromBtn))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(ReadEEpromFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel11))
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(WriteEEpromFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel12)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ReadEEpromBtn)
+                            .addComponent(VerifyFEEpromBtn)
+                            .addComponent(WriteEEpromBtn))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
+
+                jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jPanel2.TabConstraints.tabTitle"), jPanel2); // NOI18N
+
+                ReadFuse.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.ReadFuse.text")); // NOI18N
+                ReadFuse.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        ReadFuseActionPerformed(evt);
+                    }
+                });
+
+                VerifyFuse.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.VerifyFuse.text")); // NOI18N
+                VerifyFuse.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        VerifyFuseActionPerformed(evt);
+                    }
+                });
+
+                WriteFuse.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.WriteFuse.text")); // NOI18N
+
+                FusesTable.setBackground(new java.awt.Color(238, 238, 238));
+                FusesTable.setModel(FuseTableModel);
+                jScrollPane2.setViewportView(FusesTable);
+
+                javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+                jPanel3.setLayout(jPanel3Layout);
+                jPanel3Layout.setHorizontalGroup(
+                    jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(ReadFuse)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(VerifyFuse)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(WriteFuse)
+                                .addContainerGap())
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)))
+                );
+                jPanel3Layout.setVerticalGroup(
+                    jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ReadFuse)
+                            .addComponent(VerifyFuse)
+                            .addComponent(WriteFuse))
+                        .addContainerGap(75, Short.MAX_VALUE))
+                );
+
+                jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jPanel3.TabConstraints.tabTitle"), jPanel3); // NOI18N
+
+                jLabel7.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+                jLabel7.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jLabel7.text")); // NOI18N
+
+                ReadLBbtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.ReadLBbtn.text")); // NOI18N
+                ReadLBbtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        ReadLBbtnActionPerformed(evt);
+                    }
+                });
+
+                VerifyLBbtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.VerifyLBbtn.text")); // NOI18N
+                VerifyLBbtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        VerifyLBbtnActionPerformed(evt);
+                    }
+                });
+
+                WriteLBbtn.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.WriteLBbtn.text")); // NOI18N
+                WriteLBbtn.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        WriteLBbtnActionPerformed(evt);
+                    }
+                });
+
+                LockBitTable.setModel(LockBitTableModel);
+                jScrollPane4.setViewportView(LockBitTable);
+
+                javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+                jPanel4.setLayout(jPanel4Layout);
+                jPanel4Layout.setHorizontalGroup(
+                    jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addComponent(ReadLBbtn)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(VerifyLBbtn)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(WriteLBbtn))
+                                    .addComponent(jLabel7))
+                                .addContainerGap())))
+                );
+                jPanel4Layout.setVerticalGroup(
+                    jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ReadLBbtn)
+                            .addComponent(VerifyLBbtn)
+                            .addComponent(WriteLBbtn))
+                        .addGap(51, 51, 51))
+                );
+
+                jTabbedPane1.addTab(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jPanel4.TabConstraints.tabTitle"), jPanel4); // NOI18N
+
+                jButton1.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jButton1.text")); // NOI18N
+                jButton1.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        jButton1ActionPerformed(evt);
+                    }
+                });
+
+                jButton2.setText(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jButton2.text")); // NOI18N
+                jButton2.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        jButton2ActionPerformed(evt);
+                    }
+                });
+
+                javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+                jPanel5.setLayout(jPanel5Layout);
+                jPanel5Layout.setHorizontalGroup(
+                    jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                );
+                jPanel5Layout.setVerticalGroup(
+                    jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                        .addGap(1, 1, 1)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jButton2)))
+                );
+
+                jTabbedPane1.getAccessibleContext().setAccessibleName(org.openide.util.NbBundle.getMessage(AvrDudeTool.class, "AvrDudeTool.jTabbedPane1.AccessibleContext.accessibleName")); // NOI18N
+
+                add(jPanel5, java.awt.BorderLayout.CENTER);
+
+                pack();
+            }// </editor-fold>//GEN-END:initComponents
+
+    private void updateTable(List<String> mem, javax.swing.table.DefaultTableModel tbl) {
+        this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+        int rowCount = tbl.getRowCount();
+        for (int i = rowCount - 1; i >= 0; i--) {
+            tbl.removeRow(i);
+
+        }
+        for (int i = 0; i < mem.size(); i++) {
+            tbl.addRow(new Object[]{mem.get(i), ""});
+
+        }
+    }
+
+    /**
+     * Closes the dialog
+     */
+    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
+        setVisible(false);
+        dispose();
+    }//GEN-LAST:event_closeDialog
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        NbPreferences.forModule(AvrDudeProfile.class).put("lastProfile", (String) PrgmProfileComboBox.getSelectedItem());
+        NbPreferences.forModule(AvrDudeProfile.class).put("lastMCU", (String) targetMcuCombobox.getSelectedItem());
+        NbPreferences.forModule(AvrDudeProfile.class).put("lastFlashFile", FlashFilefield.getText());
+        NbPreferences.forModule(AvrDudeProfile.class).put("lastEEpromFile", EEpromFilefield.getText());
+
+        setVisible(false);
+        dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        setVisible(false);
+        dispose();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void ProfilesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProfilesActionPerformed
+        OptionsDisplayer.getDefault().open("AVR/AvrDude");
+    }//GEN-LAST:event_ProfilesActionPerformed
+
+    private void SelectFileFlashBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectFileFlashBtnActionPerformed
+        JFileChooser chooser = new JFileChooser();
+
+        chooser.setDialogTitle("Select flash file");
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int returnVal = chooser.showOpenDialog(AvrDudeTool.this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File f = chooser.getSelectedFile();
+            FlashFilefield.setText(f.getPath());
+        }
+    }//GEN-LAST:event_SelectFileFlashBtnActionPerformed
+
+    private void SelectFileFEEpromBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectFileFEEpromBtnActionPerformed
+        JFileChooser chooser = new JFileChooser();
+
+        chooser.setDialogTitle("Select EEProm file");
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int returnVal = chooser.showOpenDialog(AvrDudeTool.this);
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File f = chooser.getSelectedFile();
+            EEpromFilefield.setText(f.getPath());
+        }
+    }//GEN-LAST:event_SelectFileFEEpromBtnActionPerformed
+
+    private void ReadFlashBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReadFlashBtnActionPerformed
+        if (FlashFilefield.getText() != null) {
+
+            if ((new File(FlashFilefield.getText())).exists()) {
+                int r = JOptionPane.showConfirmDialog(this, "File already exists! Do you want to overwrite the existing file?");
+
+                if (r != 0) {
+                    return;
+                }
+            }
+
+
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            String cmd = avrdudeProfile.getBasicCmd() + " -U flash:r:" + FlashFilefield.getText() + ":" + ReadFlashFormat.getSelectedItem();
+
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Read flash", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_ReadFlashBtnActionPerformed
+
+    private void VerifyFEEpromBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifyFEEpromBtnActionPerformed
+        if (FlashFilefield.getText() != null) {
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            String cmd = avrdudeProfile.getBasicCmd() + " -U eeprom:v:" + EEpromFilefield.getText() + ":" + WriteEEpromFormat.getSelectedItem();
+
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Verify EEprom", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_VerifyFEEpromBtnActionPerformed
+
+    private void VerifyFlashBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifyFlashBtnActionPerformed
+        if (FlashFilefield.getText() != null) {
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            String cmd = avrdudeProfile.getBasicCmd() + " -U flash:v:" + FlashFilefield.getText() + ":" + WriteFlashFormat.getSelectedItem();
+
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Verify flash", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_VerifyFlashBtnActionPerformed
+
+    private void WriteFlashBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_WriteFlashBtnActionPerformed
+        if (FlashFilefield.getText() != null) {
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            String cmd = avrdudeProfile.getBasicCmd() + " -U flash:w:" + FlashFilefield.getText() + ":" + WriteFlashFormat.getSelectedItem();
+
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Write flash", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_WriteFlashBtnActionPerformed
+
+    private void ReadEEpromBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReadEEpromBtnActionPerformed
+        if (EEpromFilefield.getText() != null) {
+
+            if ((new File(EEpromFilefield.getText())).exists()) {
+                int r = JOptionPane.showConfirmDialog(this, "File already exists! Do you want to overwrite the existing file?");
+
+                if (r != 0) {
+                    return;
+                }
+            }
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            String cmd = avrdudeProfile.getBasicCmd() + " -U eeprom:r:" + EEpromFilefield.getText() + ":" + ReadEEpromFormat.getSelectedItem();
+
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Read EEprom", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_ReadEEpromBtnActionPerformed
+
+    private void WriteEEpromBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_WriteEEpromBtnActionPerformed
+        if (FlashFilefield.getText() != null) {
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            String cmd = avrdudeProfile.getBasicCmd() + " -U eeprom:w:" + EEpromFilefield.getText() + ":" + WriteEEpromFormat.getSelectedItem();
+
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Write EEprom", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_WriteEEpromBtnActionPerformed
+
+    private void GetConnectedBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GetConnectedBtnActionPerformed
+        this.avrdudeProfile.setProfile((String) PrgmProfileComboBox.getSelectedItem());
+        this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+        targetMcuCombobox.setSelectedItem(avrdudeProfile.getConectedMCU(""));
+    }//GEN-LAST:event_GetConnectedBtnActionPerformed
+
+    private void ReadLBbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReadLBbtnActionPerformed
+        this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+        this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+        String cmd1 = "";
+        try {
+            for (int i = 0; i < LockBitTableModel.getRowCount(); i++) {
+                tempFiles[i] = File.createTempFile(lockBitMem.get(i), ".hex");
+                cmd1 = cmd1 + " -U " + LockBitTableModel.getValueAt(i, 0) + ":r:" + tempFiles[i].getAbsolutePath() + ":h";
+
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        String cmd = avrdudeProfile.getBasicCmd() + cmd1;
+        AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Read LockBit", cmd);
+        avrDudeRunnable.addObserver(this);
+        new Thread(avrDudeRunnable).start();
+    }//GEN-LAST:event_ReadLBbtnActionPerformed
+
+    private void VerifyLBbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifyLBbtnActionPerformed
+        String cmd1 = "";
+        if (FlashFilefield.getText() != null) {
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            for (int i = 0; i < LockBitTableModel.getRowCount(); i++) {
+
+                cmd1 = cmd1 + " -U " + LockBitTableModel.getValueAt(i, 0) + ":v:" + LockBitTableModel.getValueAt(i, 1) + ":m";
+
+
+            }
+
+
+            String cmd = avrdudeProfile.getBasicCmd() + cmd1;
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Verify LockBit", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+
+        }
+    }//GEN-LAST:event_VerifyLBbtnActionPerformed
+
+    private void WriteLBbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_WriteLBbtnActionPerformed
+        String cmd1 = "";
+        if (FlashFilefield.getText() != null) {
+            this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+            this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+            for (int i = 0; i < LockBitTableModel.getRowCount(); i++) {
+
+                cmd1 = cmd1 + " -U " + LockBitTableModel.getValueAt(i, 0) + ":w:" + LockBitTableModel.getValueAt(i, 1) + ":m";
+
+
+            }
+            String cmd = avrdudeProfile.getBasicCmd() + cmd1;
+            AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Write LockBit", cmd);
+            avrDudeRunnable.addObserver(this);
+            new Thread(avrDudeRunnable).start();
+        }
+    }//GEN-LAST:event_WriteLBbtnActionPerformed
+
+    private void ReadFuseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ReadFuseActionPerformed
+        // TODO add your handling code here:
+
+        String cmd1 = "";
+        this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+        this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+
+        try {
+            for (int i = 0; i < FuseTableModel.getRowCount(); i++) {
+                tempFiles[i] = File.createTempFile(fusesMem.get(i), ".hex");
+                cmd1 = cmd1 + " -U " + FuseTableModel.getValueAt(i, 0) + ":r:" + tempFiles[i].getAbsolutePath() + ":h";
+            }
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
+        String cmd = avrdudeProfile.getBasicCmd() + cmd1;
+//            
+        AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Read fuses", cmd);
+        avrDudeRunnable.addObserver(this);
+        new Thread(avrDudeRunnable).start();
+    }//GEN-LAST:event_ReadFuseActionPerformed
+
+    private void VerifyFuseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_VerifyFuseActionPerformed
+        // TODO add your handling code here:
+        String cmd1 = "";
+        this.avrdudeProfile = AvrDudeProfile.getInstance((String) PrgmProfileComboBox.getSelectedItem());
+        this.avrdudeProfile.setMCU((String) targetMcuCombobox.getSelectedItem());
+        for (int i = 0; i < FuseTableModel.getRowCount(); i++) {
+
+            cmd1 = cmd1 + " -U " + FuseTableModel.getValueAt(i, 0) + ":v:" + FuseTableModel.getValueAt(i, 1) + ":m";
+
+
+        }
+
+
+        String cmd = avrdudeProfile.getBasicCmd() + cmd1;
+//            
+        AvrDudeRunnable avrDudeRunnable = new AvrDudeRunnable("Verify fuses", cmd);
+        avrDudeRunnable.addObserver(this);
+        new Thread(avrDudeRunnable).start();
+    }//GEN-LAST:event_VerifyFuseActionPerformed
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField EEpromFilefield;
+    private javax.swing.JTextField FlashFilefield;
+    private javax.swing.JTable FusesTable;
+    private javax.swing.JButton GetConnectedBtn;
+    private javax.swing.JTable LockBitTable;
+    private javax.swing.JTextArea Messages;
+    private javax.swing.JComboBox PrgmProfileComboBox;
+    private javax.swing.JButton Profiles;
+    private javax.swing.JButton ReadEEpromBtn;
+    private javax.swing.JComboBox ReadEEpromFormat;
+    private javax.swing.JButton ReadFlashBtn;
+    private javax.swing.JComboBox ReadFlashFormat;
+    private javax.swing.JButton ReadFuse;
+    private javax.swing.JButton ReadLBbtn;
+    private javax.swing.JButton SelectFileFEEpromBtn;
+    private javax.swing.JButton SelectFileFlashBtn;
+    private javax.swing.JButton VerifyFEEpromBtn;
+    private javax.swing.JButton VerifyFlashBtn;
+    private javax.swing.JButton VerifyFuse;
+    private javax.swing.JButton VerifyLBbtn;
+    private javax.swing.JButton WriteEEpromBtn;
+    private javax.swing.JComboBox WriteEEpromFormat;
+    private javax.swing.JButton WriteFlashBtn;
+    private javax.swing.JComboBox WriteFlashFormat;
+    private javax.swing.JButton WriteFuse;
+    private javax.swing.JButton WriteLBbtn;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTree jTree1;
+    private javax.swing.JComboBox targetMcuCombobox;
+    // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        AvrDudeExitStatus obj = (AvrDudeExitStatus) arg;
+        if (!AvrDudeExitStatus.failed) {
+            if (AvrDudeExitStatus.command.equals("Read LockBit")) {
+                try {
+                    for (int i = 0; i < LockBitTable.getRowCount(); i++) {
+                        BufferedReader in = new BufferedReader(new FileReader(tempFiles[i].getAbsolutePath()));
+                        String str;
+                        String val = "";
+                        while ((str = in.readLine()) != null) {
+                            val = val + str;
+                        }
+                        LockBitTable.setValueAt(val, i, 1);
+                        in.close();
+                        tempFiles[i].delete();
+                    }
+                } catch (IOException e) {
+                }
+            }
+            if (AvrDudeExitStatus.command.equals("Read fuses")) {
+
+                try {
+                    for (int i = 0; i < FuseTableModel.getRowCount(); i++) {
+                        BufferedReader in = new BufferedReader(new FileReader(tempFiles[i].getAbsolutePath()));
+                        String str;
+                        String val = "";
+                        while ((str = in.readLine()) != null) {
+                            val = val + str;
+                        }
+                        FusesTable.setValueAt(val, i, 1);
+
+                        in.close();
+                        tempFiles[i].delete();
+                    }
+                } catch (IOException e) {
+                }
+            }
+            if (AvrDudeExitStatus.command.equals("")) {
+            }
+            JOptionPane.showMessageDialog(this, AvrDudeExitStatus.textInfo, AvrDudeExitStatus.status, JOptionPane.INFORMATION_MESSAGE);
+        } else {
+
+            JOptionPane.showMessageDialog(this, AvrDudeExitStatus.textInfo, AvrDudeExitStatus.status, JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}

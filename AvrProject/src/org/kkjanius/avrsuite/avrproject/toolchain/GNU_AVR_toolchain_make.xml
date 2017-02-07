@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolchaindefinition xmlns="http://www.netbeans.org/ns/cnd-toolchain-definition/1">
+    <make>
+        <tool name="gmake,make"/>
+        <alternative_path>
+            <path directory="$PATH"/>
+            <path toolchain_family="GNU"/>
+            <path toolchain_name="*"/>
+        </alternative_path>
+        <version flags="--version" />
+        <dependency_support code="include $(wildcard $(addsuffix .d, ${OBJECTFILES}))\n" />
+    </make>
+</toolchaindefinition>

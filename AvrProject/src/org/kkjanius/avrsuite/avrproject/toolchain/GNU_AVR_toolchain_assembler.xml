@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolchaindefinition xmlns="http://www.netbeans.org/ns/cnd-toolchain-definition/1">
+    <assembler>
+        <compiler name="avr-as"/>
+        <version flags="-version"/>
+        <development_mode>
+            <fast_build flags=""/>
+            <debug flags="-g" default="true"/>
+            <performance_debug flags="-g"/>
+            <test_coverage flags="-g"/>
+            <diagnosable_release flags="-g"/>
+            <release flags=""/>
+            <performance_release flags=""/>
+        </development_mode>
+        <warning_level>
+            <no_warnings flags="-W"/>
+            <default flags="" default="true"/>
+            <more_warnings flags=""/>
+            <warning2error flags="--fatal-warnings"/>
+        </warning_level>
+        <architecture>
+            <default flags="" default="true"/>
+            <bits_32 flags="--32"/>
+            <bits_64 flags="--64"/>
+        </architecture>
+        <strip flags="-s"/>
+        <output_object_file flags="-o " />
+    </assembler>
+</toolchaindefinition>

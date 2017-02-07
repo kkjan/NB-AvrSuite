@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+<filesystem>
+<folder name="Actions">
+        <folder name="AVR">
+            <file name="org-kkjanius-avrsuite-avrproject-action-AvrMainAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
+                <attr name="displayName" bundlevalue="org.kkjanius.avrsuite.avrproject.action.Bundle#CTL_AvrMainAction"/>
+                <attr name="injectable" stringvalue="org.kkjanius.avrsuite.avrproject.action.AvrMainAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="noIconInMenu" boolvalue="false"/>
+                <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
+                <attr name="type" stringvalue="org.netbeans.api.project.Project"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="CND">
+     <folder name="Tool">
+          <file name="GNU_AVR_toolchain_flavor" url="toolchain/GNU_AVR_toolchain_flavor.xml">
+                <attr name="extends" stringvalue="GNU_flavor"/>
+            </file>
+            
+            <file name="GNU_AVR_toolchain_c" url="toolchain/GNU_AVR_toolchain_c.xml">
+                <attr name="extends" stringvalue="GNU_c"/>
+            </file>
+            <file name="GNU_AVR_toolchain_cpp" url="toolchain/GNU_AVR_toolchain_cpp.xml">
+                <attr name="extends" stringvalue="GNU_cpp"/>
+            </file>
+            <file name="GNU_AVR_toolchain_assembler" url="toolchain/GNU_AVR_toolchain_assembler.xml">
+                <attr name="extends" stringvalue="GNU_assembler"/>
+            </file>
+            <file name="GNU_AVR_toolchain_linker" url="toolchain/GNU_AVR_toolchain_linker.xml">
+                <attr name="extends" stringvalue="GNU_linker"/>
+            </file>
+             <file name="GNU_AVR_toolchain_make" url="toolchain/GNU_AVR_toolchain_make.xml">
+                <attr name="extends" stringvalue="GNU_make"/>
+            </file>
+                
+            <file name="GNU_WinAVR_toolchain_flavor" url="toolchain/GNU_WinAVR_toolchain_flavor.xml">
+                <attr name="extends" stringvalue="GNU_flavor"/>
+            </file>
+            
+            <file name="GNU_WinAVR_toolchain_c" url="toolchain/GNU_WinAVR_toolchain_c.xml">
+                <attr name="extends" stringvalue="GNU_c"/>
+            </file>
+            <file name="GNU_WinAVR_toolchain_cpp" url="toolchain/GNU_WinAVR_toolchain_cpp.xml">
+                <attr name="extends" stringvalue="GNU_cpp"/>
+            </file>
+            <file name="GNU_WinAVR_toolchain_assembler" url="toolchain/GNU_WinAVR_toolchain_assembler.xml">
+                <attr name="extends" stringvalue="GNU_assembler"/>
+            </file>
+            <file name="GNU_WinAVR_toolchain_linker" url="toolchain/GNU_WinAVR_toolchain_linker.xml">
+                <attr name="extends" stringvalue="GNU_linker"/>
+            </file>
+             <file name="GNU_WinAVR_toolchain_make" url="toolchain/GNU_WinAVR_toolchain_make.xml">
+                <attr name="extends" stringvalue="GNU_make"/>
+            </file>
+        </folder>
+        <folder name="ToolChains">
+                  <folder name="GNU_AVR_toolchain">
+                <attr name="displayName" bundlevalue="org.kkjanius.avrsuite.avrproject.Bundle#CND/ToolChains/GNU_AVR_toolchain"/>
+                <attr name="position" intvalue="5000"/>
+                <file name="flavor.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_AVR_toolchain_flavor"/>
+                </file>
+                <file name="c.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_AVR_toolchain_c"/>
+                </file>
+                <file name="cpp.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_AVR_toolchain_cpp"/>
+                </file>
+               
+                <file name="assembler.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_AVR_toolchain_assembler"/>
+                </file>
+                           <file name="linker.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_AVR_toolchain_linker"/>
+                </file>
+                <file name="make.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_AVR_toolchain_make"/>
+                </file>
+             </folder>
+             
+             <folder name="GNU_WinAVR_toolchain">
+                <attr name="displayName" bundlevalue="org.kkjanius.avrsuite.avrproject.Bundle#CND/ToolChains/GNU_WinAVR_toolchain"/>
+                <attr name="position" intvalue="5000"/>
+                <file name="flavor.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_WinAVR_toolchain_flavor"/>
+                </file>
+                <file name="c.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_WinAVR_toolchain_c"/>
+                </file>
+                <file name="cpp.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_WinAVR_toolchain_cpp"/>
+                </file>
+               
+                <file name="assembler.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_WinAVR_toolchain_assembler"/>
+                </file>
+                           <file name="linker.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_WinAVR_toolchain_linker"/>
+                </file>
+                <file name="make.shadow">
+                    <attr name="originalFile" stringvalue="CND/Tool/GNU_WinAVR_toolchain_make"/>
+                </file>
+             </folder>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="Tools">
+           
+            <file name="org-kkjanius-avrsuite-avrproject-action-AvrMainAction-separatorAfter.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1268"/>
+            </file>
+            
+            <file name="org-kkjanius-avrsuite-avrproject-action-AvrMainAction-separatorBefore.instance">
+                <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                <attr name="position" intvalue="1256"/>
+            </file>
+             <folder name="AVR Suite">
+                <attr name="position" intvalue="1262"/>
+                <file name="org-kkjanius-avrsuite-avrproject-action-AvrMainAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/AVR/org-kkjanius-avrsuite-avrproject-action-AvrMainAction.instance"/>
+                    <attr name="position" intvalue="100"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+    <folder name="OptionsDialog">
+        <folder name="AVR">
+            <file name="org-kkjanius-avrsuite-avrproject-ui-optionsdialog-ProjectOptionPanelController.instance">
+                <attr name="controller" newvalue="org.kkjanius.avrsuite.avrproject.ui.optionsdialog.ProjectOptionPanelController"/>
+                <attr name="displayName" stringvalue="Project option"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.spi.options.AdvancedOption.createSubCategory"/>
+                <attr name="keywords" stringvalue="Project option"/>
+                <attr name="keywordsCategory" stringvalue="AVR/Projectoption"/>
+                <attr name="position" intvalue="100"/>
+            </file>
+        </folder>
+    </folder>
+</filesystem>

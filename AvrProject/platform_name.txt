@@ -1,0 +1,1 @@
+NetBeans Platform 7.0 AVRToolchain

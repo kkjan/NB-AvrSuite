@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolchaindefinition xmlns="http://www.netbeans.org/ns/cnd-toolchain-definition/1">
+    <toolchain name="GNU_AVR" display="AVR toolchain" family="GNU" qmakespec="${os}-g++"/>
+          <platforms stringvalue="linux,unix,none"/>
+ <makefile_writer class="org.kkjanius.avrsuite.avrproject.makefilewriter.AVRDefaultMakefileWriter"/>
+    <default_locations>
+        <platform os="linux" directory="/usr/bin"/>
+        <platform os="sun_intel" directory="/opt/sfw/bin"/>
+        <platform os="sun_intel" directory="/usr/sfw/bin"/>
+        <platform os="sun_sparc" directory="/opt/sfw/bin"/>
+        <platform os="sun_sparc" directory="/usr/sfw/bin"/>
+    </default_locations>
+    <drive_letter_prefix stringvalue="/"/>
+</toolchaindefinition>

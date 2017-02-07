@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.kkjanius.avrsuite.avrdude
+OpenIDE-Module-Implementation-Version: 2
+OpenIDE-Module-Layer: org/kkjanius/avrsuite/avrdude/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/kkjanius/avrsuite/avrdude/Bundle.properties
+OpenIDE-Module-Provides: org.kkjanius.avrsuite.api.avrprogrammer.AvrProgrammer
